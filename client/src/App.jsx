@@ -1,10 +1,24 @@
 import React from 'react'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import Home from './pages/Home.jsx'
+import About from './pages/About.jsx'
+import SignIn from './pages/Signin.jsx'
+import SignUp from './pages/Signup.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import Projects from './pages/Projects.jsx'
 
 function App() {
   return (
-    <div>
-      <h1>Helo World</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/sign-in' element={<SignIn />} />
+        <Route path='/sign-up' element={<SignUp />} />
+        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/projects' element={<Projects />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
