@@ -1,21 +1,19 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
+import { useDispatch, useSelector } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
 
 function SignIn() {
   const [formData, setFormData] = useState({});
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState(null);
 
-  const [errorMessage, setErrorMessage] = useState(null);
-
+  const { loading, error: errorMessage } = useSelector(state => state.user);
+  const dispatch = useDispatch();
+  
   const navigate = useNavigate();
-
-  const delay = async () => {
-    setTimeout(() => {
-      console.log('After 5 seconds delay');
-    }, 5000); // 5000 milliseconds = 5 seconds
-  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
@@ -26,12 +24,12 @@ function SignIn() {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      return setErrorMessage("Please Fill All The Fields");
+      dispatch(signInFailure("Fill All the Field"))
     }
 
     try {
-      setLoading(true)
-      setErrorMessage(null)
+      // setLoading(true)
+      dispatch(signInStart());
 
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -44,17 +42,20 @@ function SignIn() {
       console.log(data);
 
       if (data.success === false) {
-        return setErrorMessage(data.message)
+        // return setErrorMessage(data.message)
+        dispatch(signInFailure(data.message));
       }
 
-      setLoading(false)
+
       if (res.ok) {
-        navigate("/Home");  
+        dispatch(signInSuccess(data))
+        navigate("/Home");
       }
 
     } catch (err) {
       console.log(err);
-      setLoading(false)
+      // setLoading(false)
+      dispatch(signInFailure(err))
     }
   }
 
@@ -128,11 +129,11 @@ function SignIn() {
 
           {
             errorMessage &&
-              (
-                <Alert className='mt-5' color={'failure'}>
-                  {firstWord(errorMessage) === 'E11000' ? "No User Exist" : (errorMessage)}
-                </Alert>
-              )
+            (
+              <Alert className='mt-5' color={'failure'}>
+                {(errorMessage)}
+              </Alert>
+            )
           }
 
         </div>

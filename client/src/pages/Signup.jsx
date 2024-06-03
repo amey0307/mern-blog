@@ -13,12 +13,6 @@ function Signup() {
 
   const [userSaved, setUserSaved] = useState(false);
 
-  const delay = async () => {
-    setTimeout(() => {
-      console.log('After 5 seconds delay');
-    }, 5000); // 5000 milliseconds = 5 seconds
-  }
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
   }
@@ -51,9 +45,6 @@ function Signup() {
 
       setLoading(false)
       if (res.ok) {
-        delay();
-        setUserSaved(true);
-        delay();
         navigate("/sign-in");  
       }
 
