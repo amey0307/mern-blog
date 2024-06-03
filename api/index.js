@@ -24,7 +24,10 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
+//testing api
 app.use('/api/user', userRoutes);
+
+//authentication api
 app.use('/api/auth', authRoutes);
 
 //middleware for error

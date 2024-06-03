@@ -54,7 +54,7 @@ function Signup() {
         delay();
         setUserSaved(true);
         delay();
-        navigate("/");  
+        navigate("/sign-in");  
       }
 
     } catch (err) {
