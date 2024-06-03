@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
+import GoogleButton from 'react-google-button'
 
 function SignIn() {
   const [formData, setFormData] = useState({});
@@ -12,7 +13,7 @@ function SignIn() {
 
   const { loading, error: errorMessage } = useSelector(state => state.user);
   const dispatch = useDispatch();
-  
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -119,6 +120,8 @@ function SignIn() {
                 ) : 'SignUp'
                 }
               </Button>
+
+                
             </div>
           </form>
 
