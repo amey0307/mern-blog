@@ -27,6 +27,7 @@ app.listen(port, () => {
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 
+//middleware for error
 app.use((err, req, res, next)=>{
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error"
@@ -34,6 +35,6 @@ app.use((err, req, res, next)=>{
     res.status(statusCode).json({
         success: false,
         statusCode,
-        message
+        message,
     })
 })

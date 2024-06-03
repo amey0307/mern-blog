@@ -22,7 +22,10 @@ export const signup = async (req,res, next)=>{
 
         await newUser.save()
         .then(()=>{
-            res.json({message: "User Saved"})
+            res.json({
+                success: true,
+                message: "User Saved"
+            })
         })
         .catch((err)=>{
             next(err)
