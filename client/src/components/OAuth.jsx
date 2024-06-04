@@ -29,7 +29,7 @@ function OAuth() {
             if (res.ok) {
                 console.log(data);
                 dispatch(signInSuccess(data))
-                navigate('/')
+                navigate('/dashboard?tab=profile')
             }
         } catch (error) {
             console.log(error);

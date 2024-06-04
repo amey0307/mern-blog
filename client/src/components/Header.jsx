@@ -41,7 +41,7 @@ function Header() {
                     {theme==='light' ? <FaMoon /> : <FaSun className='text-yellow-400 scale-150' />}
                 </Button>
 
-                <Link to={'/sign-in'}>
+                <div>
                     {
                         currentUser ? 
                         (
@@ -65,10 +65,12 @@ function Header() {
                         )
                         :
                         (
-                            <Button outline gradientDuoTone={'purpleToBlue'}>Sign In</Button>
+                            <Link to={'/sign-in'}>
+                                <Button outline gradientDuoTone={'purpleToBlue'}>Sign In</Button>
+                            </Link>
                         )
                     }
-                </Link>
+                </div>
                 <Navbar.Toggle />
             </div>
 
