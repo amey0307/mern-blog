@@ -51,7 +51,7 @@ function SignIn() {
 
       if (res.ok) {
         dispatch(signInSuccess(data))
-        navigate("/Home");
+        navigate("/dashboard");
       }
 
     } catch (err) {
@@ -72,7 +72,7 @@ function SignIn() {
   }
 
   return (
-    <div className='min-h-screen mt-20'>
+    <div className='mt-20 min-h-screen'>
       <div className='flex flex-wrap p-3 gap-5 max-w-4xl mx-auto flex-col md:flex-row md:items-center overflow-y-hidden'>
         {/* left */}
         <div className='flex-1'>
@@ -136,7 +136,7 @@ function SignIn() {
             errorMessage &&
             (
               <Alert className='mt-5' color={'failure'}>
-                {(errorMessage)}
+                {(errorMessage.message || errorMessage)}
               </Alert>
             )
           }
