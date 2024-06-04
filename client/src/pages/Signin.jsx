@@ -4,6 +4,7 @@ import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
 import GoogleButton from 'react-google-button'
+import OAuth from '../components/OAuth';
 
 function SignIn() {
   const [formData, setFormData] = useState({});
@@ -108,7 +109,7 @@ function SignIn() {
 
               <Button
                 gradientDuoTone={'purpleToPink'}
-                className='mt-5 min-w-full hover:scale-105 transition-all'
+                className='mt-5 min-w-full'
                 type='submit'
                 disabled={loading}
               >
@@ -117,10 +118,11 @@ function SignIn() {
                     <Spinner size={'sm'} />
                     <span className='pl-3'>Loading...</span>
                   </>
-                ) : 'SignUp'
+                ) : 'Sign In'
                 }
               </Button>
 
+              <OAuth />
                 
             </div>
           </form>

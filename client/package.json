@@ -15,6 +15,7 @@
     "@mui/material": "^5.15.19",
     "@reduxjs/toolkit": "^2.2.5",
     "body-parser": "^1.20.2",
+    "firebase": "^10.12.2",
     "flowbite-react": "^0.9.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
