@@ -7,7 +7,11 @@ export default {
     flowbite.content(),
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Quicksand', 'sans-serif'],
+      },
+    },
   },
   plugins: [
     flowbite.plugin(),
