@@ -17,7 +17,7 @@ function Signup() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
   }
-  console.log(formData)
+  // console.log(formData)
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -8,50 +8,38 @@ import { signInSuccess } from '../redux/user/userSlice.js'
 import { useNavigate } from 'react-router-dom'
 
 function OAuth() {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const auth = getAuth(app)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
     const handleGoogleClick = async () => {
+        const provider = new GoogleAuthProvider()
+        provider.setCustomParameters({ prompt: 'select_account' })
         try {
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({prompt: 'select_account'})
-            const auth = getAuth(app);
-
-            const result = await signInWithPopup(auth, provider);
+            const resultsFromGoogle = await signInWithPopup(auth, provider)
             const res = await fetch('/api/auth/google', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: result.user.displayName,
-                    email: result.user.email,
-                    photo: result.user.photoURL,
+                    name: resultsFromGoogle.user.displayName,
+                    email: resultsFromGoogle.user.email,
+                    googlePhotoUrl: resultsFromGoogle.user.photoURL,
                 }),
-            });
-            const data = await res.json();
-            console.log(data);
-            
-            if(res.ok){
-                dispatch(signInSuccess(data));
-                navigate('/');
+            })
+            const data = await res.json()
+            if (res.ok) {
+                console.log(data);
+                dispatch(signInSuccess(data))
+                navigate('/')
             }
-            
         } catch (error) {
-            console.log('could not login with google', error);
+            console.log(error);
         }
-    };
+    }
 
     return (
-        <Button
-            outline gradientDuoTone={'pinkToOrange'}
-            type='button'
-            onClick={handleGoogleClick}
-            className='min-w-full mt-4 flex items-center'
-        >
-            <div className='flex items-center'>
-                <AiFillGoogleCircle className='w-6 h-6 mr-2' />
-                Sign In With Goole
-            </div>
+        <Button type='button' gradientDuoTone='pinkToOrange' outline onClick={handleGoogleClick} className='min-w-full mt-4'>
+            <AiFillGoogleCircle className='w-6 h-6 mr-2' />
+            Continue with Google
         </Button>
     )
 }
