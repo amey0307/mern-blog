@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 
 export const signup = async (req, res, next) => {
     //destructuring 
-    const { username, email, password } = req.body;
+    const { username, email, password, profilePicture } = req.body;
 
     try {
         if (!username || !email || !password || username === '' || email === '' || password === '') {
@@ -17,17 +17,17 @@ export const signup = async (req, res, next) => {
         const newUser = new User({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            profilePicture
         })
 
         await newUser.save()
             .then(() => {
+                const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
                 res
                     .status(200)
-                    .json({
-                        success: true,
-                        message: "User Saved"
-                    })
+                    .cookie('access_token', token, { httpOnly: true, maxAge: 60 * 60 * 1000})
+                    .json(newUser)
             })
             .catch((err) => {
                 next(err)
@@ -74,10 +74,7 @@ export const signin = async (req, res, next) => {
         res.status(200).cookie('access_token', token, {
             httpOnly: true,
             maxAge: 60 * 60 * 1000
-        }).json({
-            message: "Sign In Successfull",
-            userInfo: rest,
-        })
+        }).json(rest)
 
     } catch (e) {
         next(e);

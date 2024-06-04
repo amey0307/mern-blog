@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
-import GoogleButton from 'react-google-button'
 import OAuth from '../components/OAuth';
 
 function SignIn() {
@@ -58,16 +57,6 @@ function SignIn() {
       console.log(err);
       // setLoading(false)
       dispatch(signInFailure(err))
-    }
-  }
-
-  const firstWord = (str) => {
-    let resStr = "";
-    for (let c = 0; c < str.length; c++) {
-      if (str[c] == " ") {
-        return resStr;
-      }
-      resStr += str[c];
     }
   }
 

@@ -2,17 +2,19 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import OAuth from '../components/OAuth';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
 
 function Signup() {
   const [formData, setFormData] = useState({});
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState(null);
 
-  const [errorMessage, setErrorMessage] = useState(null);
+  const { loading, error: errorMessage } = useSelector(state => state.user);
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
-
-  const [userSaved, setUserSaved] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
@@ -23,12 +25,11 @@ function Signup() {
     e.preventDefault();
 
     if (!formData.username || !formData.email || !formData.password) {
-      return setErrorMessage("Please Fill All The Fields");
+      dispatch(signInFailure("Fill All the Field"))
     }
 
     try {
-      setLoading(true)
-      setErrorMessage(null)
+      dispatch(signInStart());
 
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -41,17 +42,17 @@ function Signup() {
       console.log(data);
 
       if (data.success === false) {
-        return setErrorMessage(data.message)
+        dispatch(signInFailure(data.message));
       }
 
-      setLoading(false)
       if (res.ok) {
+        dispatch(signInSuccess(data))
         navigate("/sign-in");  
       }
 
     } catch (err) {
-      console.log(err);
-      setLoading(false)
+      console.log(err)
+      dispatch(signInFailure(err))
     }
   }
 
@@ -135,19 +136,11 @@ function Signup() {
           </div>
 
           {
-            errorMessage ?
+            errorMessage &&
               (
                 <Alert className='mt-5' color={'failure'}>
                   {firstWord(errorMessage) === 'E11000' ? "User Already Exist" : (errorMessage)}
                 </Alert>
-              )
-              :
-              userSaved &&
-              (
-                    <Alert className='mt-5' color={'success'}>
-                      User Saved Successfully
-                      Go to <Link to={'/sign-in'} className='text-blue-600 font-mono underline'>Sign In</Link>
-                    </Alert>
               )
           }
 
