@@ -1,13 +1,43 @@
 import { Button, FileInput, Select, TextInput } from 'flowbite-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import {useSelector} from 'react-redux';
 
 function CreatePost() {
+    const [formData, setFormData] = useState({})
+    const {currentUser} = useSelector(state => state.user);
+    //document.querySelector('.ql-editor').textContent;
+    
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.id]: e.target.value
+        });
+    }
+    console.log(formData)
+
+    if(currentUser.isAdmin){
+        formData.isAdmin = true;
+    }
+    
+    const handleSubmit = async (e) => {
+        const res = await fetch('/api/post/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await res.json();
+        console.log(data)
+    }
+    
   return (
     <div className='min-h-screen text-3xl mx-auto p-3 max-w-3xl'>
         <h1 className='mx-auto text-center my-7 font-semibold text-3xl'>Create Post</h1>
-        <form>
+        <form onSubmit={handleSubmit} onChange={handleChange}>
             <div className='flex gap-5 flex-col'>
                 <TextInput 
                 label='Title' 
@@ -15,7 +45,7 @@ function CreatePost() {
                 id='title'
                 required
                 />
-            <Select>
+            <Select id='category'>
                 <option value={'uncategorized'}>Select A Category </option>
                 <option value={'javascript'}>Javascript </option>
                 <option value={'reactjs'}>React Js </option>    
