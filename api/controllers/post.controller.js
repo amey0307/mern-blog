@@ -16,7 +16,8 @@ export const createPost = async (req, res, next) => {
     const newPost = new Post({
         ...req.body,
         slug,
-        userId: req.user._id
+        userId: req.user._id,
+        photo: req.body.profilePicture
     })
 
     try{
