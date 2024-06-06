@@ -1,4 +1,4 @@
-import { Alert, Button, TextInput } from 'flowbite-react';
+import { Alert, Button, Spinner, TextInput } from 'flowbite-react';
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import ProfilePhoto from './ProfilePhoto';
@@ -8,12 +8,15 @@ import { HiEye, HiInformationCircle } from "react-icons/hi";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useDispatch } from 'react-redux';
-import { updateFailure, updateStart, updateSuccess, setUpdateMessage, setUpdateStatus } from '../redux/user/userSlice.js';
+import { updateFailure, updateStart, updateSuccess, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserStart, deleteUserSuccess, setMessageTime } from '../redux/user/userSlice.js';
+import { useNavigate } from 'react-router-dom';
+import PopUp from './PopUp.jsx';
 
 function DashProfile() {
-  const { currentUser, updateMessage, updateStatus} = useSelector(state => state.user);
+  const { currentUser, updateMessage, updateStatus, loading, messageTime } = useSelector(state => state.user);
   const { theme } = useSelector(state => state.theme);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [ImageFileUploadingProgress, setImageFileUploadingProgress] = useState(null);
   const [imageFileUploadingError, setImageFileUploadingError] = useState(null);
@@ -23,6 +26,8 @@ function DashProfile() {
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
 
+  const [showPopup, setShowPopup] = useState(false);
+
   const hangleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -31,27 +36,27 @@ function DashProfile() {
     }
   }
 
-  
+
   // console.log(imageFile, imageFileUrl)
   // console.log(currentUser.profilePicture)
   // console.log(ImageFileUploadingProgress, imageFileUploadingError)
-  
+
   //To remove the update message when the component is mounted
   useEffect(() => {
     dispatch(setUpdateMessage(null));
     dispatch(setUpdateStatus(null));
   }, [])
 
-    //to replace update message if another update is made
-    useEffect(() => {
-      if (updateMessage) {
-        const timer = setTimeout(() => {
-          dispatch(setUpdateMessage(null));
-          dispatch(setUpdateStatus(null));
-        }, 5000);
-        return () => clearTimeout(timer);
-      }
-    }, [updateMessage])
+  //to replace update message if another update is made
+  useEffect(() => {
+    if (updateMessage) {
+      const timer = setTimeout(() => {
+        dispatch(setUpdateMessage(null));
+        dispatch(setUpdateStatus(null));
+      }, messageTime*1000);
+      return () => clearTimeout(timer);
+    }
+  }, [updateMessage])
 
 
 
@@ -73,17 +78,25 @@ function DashProfile() {
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         setImageFileUploadingProgress(progress.toFixed(0));
+        dispatch(setUpdateMessage("Image Uplading"));
+        dispatch(setUpdateStatus("noChange"))
+        dispatch(setMessageTime(100))
       },
       (error) => {
         setImageFileUploadingError("Not Uploaded : Upload (jpg, jpeg, png) image.")
         setImageFile(null)
         setImageFileUrl(null)
+        dispatch(setUpdateMessage("Image Update Failed"));
+        dispatch(setUpdateStatus("false"))
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL);
           setImageFileUrl(downloadURL);
-          setFormData({...formData, profilePicture: downloadURL})
+          setFormData({ ...formData, profilePicture: downloadURL })
+          setImageFileUploadingProgress(false);
+          dispatch(setUpdateMessage("Image Update Successfully"));
+          dispatch(setUpdateStatus("true"))
         });
       }
     )
@@ -93,9 +106,9 @@ function DashProfile() {
   const [passMatch, setPassMatch] = useState(true);
 
   const handleFormChange = (e) => {
-    setFormData({...formData, [e.target.id] : e.target.value.trim()})
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
   }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (Object.keys(formData).length === 0) {
@@ -118,7 +131,7 @@ function DashProfile() {
       console.log(data);
       if (!res.ok) {
         dispatch(setUpdateStatus("false"));
-        dispatch(setUpdateMessage(`Error : ${data.message}`)); 
+        dispatch(setUpdateMessage(`Error : ${data.message}`));
         dispatch(updateFailure(data.message));
       } else {
         dispatch(updateSuccess(data));
@@ -132,29 +145,58 @@ function DashProfile() {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const data = await res.json();
+      console.log(data);
+      if (res.ok) {
+        dispatch(deleteUserSuccess());
+        dispatch(setUpdateMessage("User Deleted Successfully"));
+        dispatch(setUpdateStatus("true"));
+        navigate('/sign-in');
+      } else {
+        dispatch(setUpdateMessage(`Error : ${data.message}`));
+        dispatch(setUpdateStatus("false"));
+        dispatch(updateFailure(data.message));
+        dispatch(deleteUserFailure(data.message));
+      }
+    } catch (error) {
+      dispatch(setUpdateMessage(`Error : ${error.message}`));
+      dispatch(setUpdateStatus("false"));
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
+
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 text-center font-sans font-bold text-2xl'>Profile</h1>
       <form className='flex flex-col relative border-0' onSubmit={handleSubmit} >
 
-        <input type='file' id='profilePicture' className='hidden' accept='image/*' onChange={hangleImageChange} ref={filePickerRef}/>
+        <input type='file' id='profilePicture' className='hidden' accept='image/*' onChange={hangleImageChange} ref={filePickerRef} />
 
         {ImageFileUploadingProgress && (
           <CircularProgressbar value={ImageFileUploadingProgress || 0} text={`${ImageFileUploadingProgress}%`}
-          strokeWidth={5}
-          styles={{
-            root: {
-              width: '9em',
-              height: '9em',
-              position: 'absolute',
-              top: '-8px',
-              right: '172px',
-              zIndex: '1'
-            },
-            path: {
-              stroke: `rgba(62, 231, 153, ${ImageFileUploadingProgress / 100})`,
-            }
-          }}
+            strokeWidth={5}
+            styles={{
+              root: {
+                width: '9em',
+                height: '9em',
+                position: 'absolute',
+                top: '-8px',
+                right: '172px',
+                zIndex: '1'
+              },
+              path: {
+                stroke: `rgba(62, 231, 153)`,
+              }
+            }}
           />
         )}
 
@@ -182,6 +224,8 @@ function DashProfile() {
             placeholder='email'
             defaultValue={currentUser.email}
             onChange={handleFormChange}
+            readOnly
+            disabled
           />
           <TextInput
             type='password'
@@ -201,92 +245,82 @@ function DashProfile() {
             placeholder='new password'
             onChange={handleFormChange}
           />
-          <Button gradientDuoTone={'purpleToBlue'} outline type='submit' className='min-w-full'>
-            Update Profile
+          <Button gradientDuoTone={'purpleToBlue'} outline type='submit' className='min-w-full' disabled={loading || ImageFileUploadingProgress}>
+            {loading ? (
+              'Loading...'
+            ):'Update Profile'}
           </Button>
-          <div className='flex justify-between px-1'>
-            <div className='text-red-600 text-lg cursor-pointer'>Delete Account</div>
-            <div className='text-red-600 text-lg cursor-pointer'>Sign Out</div>
+
+          <div className='text-black text-lg cursor-pointer' >
+            <Button gradientMonochrome="failure" type='button' outline className='min-w-full rounded hover:opacity-80 transition-all' onClick={() => {
+              setShowPopup(true)
+            }}>
+              Delete Account
+            </Button>
           </div>
+            {showPopup && <PopUp handleDelete={handleDelete} setShowPopup={setShowPopup}/>}
         </div>
 
       </form>
 
       {
-        imageFileUploadingError ? 
+        !passMatch &&
         <Alert withBorderAccent
-        icon={HiInformationCircle} 
-        color='red' 
-        className='mt-4 absolute right-4 top-20 animate-SlideIn text-md'>
-          {imageFileUploadingError}
-        </Alert>
-        :
-        imageFileUrl && 
-        <Alert withBorderAccent
-        icon={HiEye} 
-        color='green' 
-        className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-          Image Uploaded Successfully
-        </Alert>
-      }
-      {
-        !passMatch && 
-        <Alert withBorderAccent
-        icon={HiInformationCircle} 
-        color='red' 
-        className='mt-4 absolute right-4 top-20 animate-SlideIn text-md'>
+          icon={HiInformationCircle}
+          color='red'
+          className='mt-4 absolute right-4 top-20 animate-SlideIn text-md'>
           Password Did Not Matched
         </Alert>
       }
-      
+
       {
-        updateMessage==="User Updated Successfully" ?
-        <Alert withBorderAccent
-        icon={HiEye} 
-        color='green' 
-        className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-          {updateMessage}
-        </Alert>
-        :
-        null
+        updateMessage === "User Updated Successfully" ?
+          <Alert withBorderAccent
+            icon={HiEye}
+            color='green'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
       }
 
       {
-        updateStatus==="true" ?
-        <Alert withBorderAccent
-        icon={HiEye} 
-        color='green' 
-        className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-          {updateMessage}
-        </Alert>
-        :
-        null
+        updateStatus === "true" ?
+          <Alert withBorderAccent
+            icon={HiEye}
+            color='green'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
       }
 
       {
-        updateStatus==="false" ?
-        <Alert withBorderAccent
-        icon={HiInformationCircle} 
-        color='red' 
-        className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-          {updateMessage}
-        </Alert>
-        :
-        null
+        updateStatus === "false" ?
+          <Alert withBorderAccent
+            icon={HiInformationCircle}
+            color='red'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
       }
 
       {
-        updateStatus==="noChange" ?
-        <Alert withBorderAccent
-        icon={HiInformationCircle} 
-        color='yellow' 
-        className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-          {updateMessage}
-        </Alert>
-        :
-        null
+        updateStatus === "noChange" ?
+          <Alert withBorderAccent
+            icon={HiInformationCircle}
+            color='yellow'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
       }
-      
+
     </div>
   )
 }

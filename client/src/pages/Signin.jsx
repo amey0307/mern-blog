@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import { useDispatch, useSelector } from 'react-redux';
-import { signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
+import { setUpdateMessage, setUpdateStatus, signInFailure, signInStart, signInSuccess } from '../redux/user/userSlice';
 import OAuth from '../components/OAuth';
+import { HiEye, HiInformationCircle } from "react-icons/hi";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
@@ -11,7 +12,7 @@ function SignIn() {
   // const [loading, setLoading] = useState(false);
   // const [errorMessage, setErrorMessage] = useState(null);
 
-  const { loading, error: errorMessage } = useSelector(state => state.user);
+  const { loading, error: errorMessage, updateMessage, updateStatus } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
@@ -21,6 +22,22 @@ function SignIn() {
   }
   // console.log(formData)
 
+  useEffect(() => {
+    dispatch(setUpdateMessage(null));
+    dispatch(setUpdateStatus(null));
+  }, [])
+
+  //to replace update message if another update is made
+  useEffect(() => {
+    if (updateMessage) {
+      const timer = setTimeout(() => {
+        dispatch(setUpdateMessage(null));
+        dispatch(setUpdateStatus(null));
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [updateMessage])
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -45,11 +62,15 @@ function SignIn() {
       if (data.success === false) {
         // return setErrorMessage(data.message)
         dispatch(signInFailure(data.message));
+        dispatch(setUpdateMessage(data.message));
+        dispatch(setUpdateStatus("false"));
       }
 
 
       if (res.ok) {
         dispatch(signInSuccess(data))
+        dispatch(setUpdateMessage("User Signed In Successfully"));
+        dispatch(setUpdateStatus("true"));
         navigate("/dashboard?tab=profile");
       }
 
@@ -122,13 +143,40 @@ function SignIn() {
           </div>
 
           {
-            errorMessage &&
-            (
-              <Alert className='mt-5' color={'failure'}>
-                {(errorMessage.message || errorMessage)}
-              </Alert>
-            )
-          }
+        updateStatus === "true" ?
+          <Alert withBorderAccent
+            icon={HiEye}
+            color='green'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
+      }
+
+      {
+        updateStatus === "false" ?
+          <Alert withBorderAccent
+            icon={HiInformationCircle}
+            color='red'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
+      }
+
+      {
+        updateStatus === "noChange" ?
+          <Alert withBorderAccent
+            icon={HiInformationCircle}
+            color='yellow'
+            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+            {updateMessage}
+          </Alert>
+          :
+          null
+      }
 
         </div>
       </div>

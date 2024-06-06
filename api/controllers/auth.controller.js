@@ -71,7 +71,7 @@ export const signin = async (req, res, next) => {
         const { password: pass, ...rest } = validUser._doc;
 
         //This will create a token for a valid user
-        const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: validUser._id, isAdmin: validUser.isAdmin}, process.env.JWT_SECRET);
         res.status(200).cookie('access_token', token, {
             httpOnly: true,
             maxAge: 60 * 60 * 1000
@@ -89,7 +89,7 @@ export const google = async (req, res, next) => {
         const validUser = await User.findOne({ email });
 
         if (validUser) {
-            const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET); //create a token
+            const token = jwt.sign({ id: validUser._id, isAdmin: validUser.isAdmin }, process.env.JWT_SECRET); //create a token
             const { password, ...rest } = validUser._doc; //to remove password to be sent to client side
             res.status(200).cookie('access_token', token, { httpOnly: true }).json(rest) //send a cookie as a response with json
         }
@@ -108,7 +108,7 @@ export const google = async (req, res, next) => {
             })
 
             await newUser.save();
-            const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+            const token = jwt.sign({ id: newUser._id, isAdmin: newUser.isAdmin }, process.env.JWT_SECRET);
             const { password, ...rest } = newUser._doc; //to remove password to be sent to client side
             res.status(200).cookie('access_token', token, { httpOnly: true }).json(rest) //send a cookie as a response with json
 

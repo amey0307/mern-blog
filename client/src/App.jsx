@@ -5,10 +5,12 @@ import About from './pages/About.jsx'
 import SignIn from './pages/Signin.jsx'
 import SignUp from './pages/Signup.jsx'
 import Dashboard from './pages/Dashboard.jsx'
-import Projects from './pages/Projects.jsx'
 import Header from './components/Header.jsx'
 import FooterCom from './components/FooterCom.jsx'
 import PrivateRouter from './components/PrivateRouter.jsx'
+import CreatePost from './pages/CreatePost.jsx'
+import Projects from './pages/Projects.jsx'
+import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx'
 
 function App() {
   return (
@@ -22,7 +24,10 @@ function App() {
         <Route element={<PrivateRouter />}>
           <Route path='/dashboard' element={<Dashboard />} />
         </Route>
+        <Route element={<OnlyAdminPrivateRoute />}>
         <Route path='/projects' element={<Projects />} />
+        <Route path='/create-post' element={<CreatePost />} />
+        </Route>
       </Routes>
       <FooterCom/>
     </BrowserRouter>
