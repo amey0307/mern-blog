@@ -1,19 +1,49 @@
 import React from 'react'
 import { Avatar, Button, Dropdown, Navbar, TextInput } from 'flowbite-react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { FaMoon, FaSun } from 'react-icons/fa'
 import {useSelector, useDispatch} from 'react-redux'
 import { toggleTheme } from '../redux/user/themeSlice'
+import { useEffect, useState } from 'react';
+import { setUpdateMessage, setUpdateStatus, signoutFailure, signoutStart, signoutSuccess } from '../redux/user/userSlice';
 
 function Header() {
     const dispatch = useDispatch();
     const path = useLocation().pathname;
     const { currentUser } = useSelector(state => state.user);
     const {theme} = useSelector(state => state.theme);
+    const navigate = useNavigate();
 
     // console.log(currentUser)
 
+    const handleSignOut = async () => {
+        try { 
+          dispatch(signoutStart());
+          const res = await fetch('/api/user/signout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          const data = await res.json();
+          if (res.ok) {
+            dispatch(setUpdateMessage("User Signed Out Successfully"));
+            dispatch(setUpdateStatus("true"));
+            dispatch(signoutSuccess());
+            navigate('/sign-in');
+          } else {
+            dispatch(setUpdateMessage(`Error : ${data.message}`));
+            dispatch(setUpdateStatus("false"));
+            dispatch(signoutFailure(data.message));
+          }
+        } catch (error) {
+          dispatch(setUpdateMessage(`Error : ${error.message}`));
+          dispatch(setUpdateStatus("false"));
+          dispatch(signoutFailure(error.message));
+        }
+      }
+    
     return (
         <Navbar className='border-b-2'>
             <Link to='/' className='self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white'>
@@ -51,6 +81,7 @@ function Header() {
                                 label={
                                     <Avatar alt='user' rounded img={currentUser.profilePicture}/>
                                 }
+                                className='z-[11]'
                             >
                                 <Dropdown.Header>
                                     <span className='block text-sm'>@{currentUser.username}</span>
@@ -60,7 +91,7 @@ function Header() {
                                     <Dropdown.Item>Profile</Dropdown.Item>
                                 </Link>
                                 <Dropdown.Divider/>
-                                <Dropdown.Item>Sign Out</Dropdown.Item>
+                                <Dropdown.Item onClick={handleSignOut}>Sign Out</Dropdown.Item>
                             </Dropdown>
                         )
                         :

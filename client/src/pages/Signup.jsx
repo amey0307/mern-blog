@@ -51,7 +51,7 @@ function Signup() {
       }
 
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       dispatch(signInFailure(err))
     }
   }

@@ -9,7 +9,7 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useDispatch } from 'react-redux';
 import { updateFailure, updateStart, updateSuccess, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserStart, deleteUserSuccess, setMessageTime } from '../redux/user/userSlice.js';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PopUp from './PopUp.jsx';
 
 function DashProfile() {
@@ -17,16 +17,14 @@ function DashProfile() {
   const { theme } = useSelector(state => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [ImageFileUploadingProgress, setImageFileUploadingProgress] = useState(null);
   const [imageFileUploadingError, setImageFileUploadingError] = useState(null);
-
   const filePickerRef = useRef(null);
-
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
-
   const [showPopup, setShowPopup] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [passMatch, setPassMatch] = useState(true);
 
   const hangleImageChange = (e) => {
     const file = e.target.files[0];
@@ -35,7 +33,6 @@ function DashProfile() {
       // setImageFileUrl(URL.createObjectURL(file));
     }
   }
-
 
   // console.log(imageFile, imageFileUrl)
   // console.log(currentUser.profilePicture)
@@ -53,12 +50,10 @@ function DashProfile() {
       const timer = setTimeout(() => {
         dispatch(setUpdateMessage(null));
         dispatch(setUpdateStatus(null));
-      }, messageTime*1000);
+      }, messageTime * 1000);
       return () => clearTimeout(timer);
     }
   }, [updateMessage])
-
-
 
   //keep track of when image is uploaded and update the profile picture in the firebase
   useEffect(() => {
@@ -67,6 +62,7 @@ function DashProfile() {
     }
   }, [imageFile])
 
+  //Upload image to firebase
   const uploadImage = async () => {
     console.log("Uploading image")
     const storage = getStorage(app);
@@ -102,13 +98,12 @@ function DashProfile() {
     )
   }
 
-  const [formData, setFormData] = useState({});
-  const [passMatch, setPassMatch] = useState(true);
-
+  //Keep track of the data in the form
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
   }
 
+  //Update the user data
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (Object.keys(formData).length === 0) {
@@ -145,6 +140,7 @@ function DashProfile() {
     }
   };
 
+  //Delete the user
   const handleDelete = async () => {
     try {
       dispatch(deleteUserStart());
@@ -172,6 +168,10 @@ function DashProfile() {
       dispatch(setUpdateStatus("false"));
       dispatch(deleteUserFailure(error.message));
     }
+  }
+
+  const handleProfile = () => {
+    navigate('/dashboard?tab=profile')
   }
 
   return (
@@ -207,8 +207,6 @@ function DashProfile() {
             imageFileUrl ? imageFileUrl : currentUser.profilePicture
           } />
         </div>
-
-
 
         <div className='min-w-full flex flex-col gap-4 mt-4'>
           <TextInput
@@ -248,8 +246,18 @@ function DashProfile() {
           <Button gradientDuoTone={'purpleToBlue'} outline type='submit' className='min-w-full' disabled={loading || ImageFileUploadingProgress}>
             {loading ? (
               'Loading...'
-            ):'Update Profile'}
+            ) : 'Update Profile'}
           </Button>
+
+          {
+            currentUser.isAdmin &&
+            <Link to={'/create-post'}>
+              <Button gradientDuoTone={'greenToBlue'} outline className='min-w-full' disabled={loading || ImageFileUploadingProgress} onClick={handleProfile}>
+                Create A Post
+              </Button>
+            </Link>
+          }
+
 
           <div className='text-black text-lg cursor-pointer' >
             <Button gradientMonochrome="failure" type='button' outline className='min-w-full rounded hover:opacity-80 transition-all' onClick={() => {
@@ -258,69 +266,71 @@ function DashProfile() {
               Delete Account
             </Button>
           </div>
-            {showPopup && <PopUp handleDelete={handleDelete} setShowPopup={setShowPopup}/>}
+          {showPopup && <PopUp handleDelete={handleDelete} setShowPopup={setShowPopup} />}
         </div>
 
       </form>
 
-      {
-        !passMatch &&
-        <Alert withBorderAccent
-          icon={HiInformationCircle}
-          color='red'
-          className='mt-4 absolute right-4 top-20 animate-SlideIn text-md'>
-          Password Did Not Matched
-        </Alert>
-      }
-
-      {
-        updateMessage === "User Updated Successfully" ?
-          <Alert withBorderAccent
-            icon={HiEye}
-            color='green'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
-          </Alert>
-          :
-          null
-      }
-
-      {
-        updateStatus === "true" ?
-          <Alert withBorderAccent
-            icon={HiEye}
-            color='green'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
-          </Alert>
-          :
-          null
-      }
-
-      {
-        updateStatus === "false" ?
+      {/* Conditional Alerts */}
+      <div>
+        {
+          !passMatch &&
           <Alert withBorderAccent
             icon={HiInformationCircle}
             color='red'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
+            className='mt-4 absolute right-4 top-20 animate-SlideIn text-md'>
+            Password Did Not Matched
           </Alert>
-          :
-          null
-      }
+        }
 
-      {
-        updateStatus === "noChange" ?
-          <Alert withBorderAccent
-            icon={HiInformationCircle}
-            color='yellow'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
-          </Alert>
-          :
-          null
-      }
+        {
+          updateMessage === "User Updated Successfully" ?
+            <Alert withBorderAccent
+              icon={HiEye}
+              color='green'
+              className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+              {updateMessage}
+            </Alert>
+            :
+            null
+        }
 
+        {
+          updateStatus === "true" ?
+            <Alert withBorderAccent
+              icon={HiEye}
+              color='green'
+              className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+              {updateMessage}
+            </Alert>
+            :
+            null
+        }
+
+        {
+          updateStatus === "false" ?
+            <Alert withBorderAccent
+              icon={HiInformationCircle}
+              color='red'
+              className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+              {updateMessage}
+            </Alert>
+            :
+            null
+        }
+
+        {
+          updateStatus === "noChange" ?
+            <Alert withBorderAccent
+              icon={HiInformationCircle}
+              color='yellow'
+              className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+              {updateMessage}
+            </Alert>
+            :
+            null
+        }
+      </div>
     </div>
   )
 }
