@@ -23,7 +23,6 @@ export const updateUser = async (req, res, next) => {
 
     if (req.body.newPassword) {
         const hashedPassword = bcryptjs.hashSync(req.body.newPassword, 10)
-        console.log(hashedPassword);
         req.body.newPassword = hashedPassword;
     }
     try {
@@ -62,6 +61,6 @@ export const deleteUser = async (req, res, next) => {
 
 export const signout = (req, res) => {
     res
-    .clearCookie('access_token')
-    .json("Signout success");
+        .clearCookie('access_token')
+        .json("Signout success");
 }

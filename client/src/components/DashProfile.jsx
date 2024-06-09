@@ -1,4 +1,4 @@
-import { Alert, Button, Spinner, TextInput } from 'flowbite-react';
+import { Alert, Button, TextInput } from 'flowbite-react';
 import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import ProfilePhoto from './ProfilePhoto';
@@ -9,12 +9,11 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useDispatch } from 'react-redux';
 import { updateFailure, updateStart, updateSuccess, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserStart, deleteUserSuccess, setMessageTime } from '../redux/user/userSlice.js';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PopUp from './PopUp.jsx';
 
 function DashProfile() {
   const { currentUser, updateMessage, updateStatus, loading, messageTime } = useSelector(state => state.user);
-  const { theme } = useSelector(state => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [ImageFileUploadingProgress, setImageFileUploadingProgress] = useState(null);
@@ -43,7 +42,6 @@ function DashProfile() {
     dispatch(setUpdateMessage(null));
     dispatch(setUpdateStatus(null));
   }, [])
-
   //to replace update message if another update is made
   useEffect(() => {
     if (updateMessage) {
@@ -170,13 +168,15 @@ function DashProfile() {
     }
   }
 
+  //handle the "create a post" button click if the user is an "admin
   const handleProfile = () => {
-    navigate('/dashboard?tab=profile')
+    navigate('/create-post')
   }
 
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 text-center font-sans font-bold text-2xl'>Profile</h1>
+      {/* Form Content`` */}
       <form className='flex flex-col relative border-0' onSubmit={handleSubmit} >
 
         <input type='file' id='profilePicture' className='hidden' accept='image/*' onChange={hangleImageChange} ref={filePickerRef} />
@@ -208,6 +208,7 @@ function DashProfile() {
           } />
         </div>
 
+        {/* Form Fields */}
         <div className='min-w-full flex flex-col gap-4 mt-4'>
           <TextInput
             type='text'
@@ -251,11 +252,9 @@ function DashProfile() {
 
           {
             currentUser.isAdmin &&
-            <Link to={'/create-post'}>
-              <Button gradientDuoTone={'greenToBlue'} outline className='min-w-full' disabled={loading || ImageFileUploadingProgress} onClick={handleProfile}>
-                Create A Post
-              </Button>
-            </Link>
+            <Button gradientDuoTone={'greenToBlue'} outline className='min-w-full' disabled={loading || ImageFileUploadingProgress} onClick={handleProfile}>
+              Create A Post
+            </Button>
           }
 
 
@@ -268,7 +267,6 @@ function DashProfile() {
           </div>
           {showPopup && <PopUp handleDelete={handleDelete} setShowPopup={setShowPopup} />}
         </div>
-
       </form>
 
       {/* Conditional Alerts */}

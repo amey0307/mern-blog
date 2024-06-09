@@ -45,6 +45,7 @@ function CreatePost() {
             [e.target.id]: e.target.value
         });
     }
+    // console.log(formData)
 
     //if user is admin, set isAdmin to true
     if (currentUser.isAdmin) {
@@ -76,7 +77,6 @@ function CreatePost() {
                 body: JSON.stringify(formData)
             });
             const data = await res.json();
-            console.log(data)
             if (res.ok) {
                 dispatch(setUpdateMessage("Post Created Successfully"));
                 dispatch(setUpdateStatus("true"));

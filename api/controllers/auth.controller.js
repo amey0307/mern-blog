@@ -24,10 +24,10 @@ export const signup = async (req, res, next) => {
         await newUser.save()
             .then(() => {
                 const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
-                const {password, ...rest} = newUser._doc;
+                const { password, ...rest } = newUser._doc;
                 res
                     .status(200)
-                    .cookie('access_token', token, { httpOnly: true, maxAge: 60 * 60 * 1000})
+                    .cookie('access_token', token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
                     .json(rest)
             })
             .catch((err) => {
@@ -54,13 +54,11 @@ export const signin = async (req, res, next) => {
 
         if (!validUser) {
             return next(errorHandler(404, "User Not Found"));
-            console.log("User Not Found")
         }
 
         const validPassword = bcryptjs.compareSync(password, validUser.password); //comaping the password
         if (!validPassword) {
             return next(errorHandler(400, "Wrong Credientials (password)"))
-            console.log("Wrong Credientials (password)")
         }
 
         console.log(`Access Granted to ${validUser.username}`)
@@ -71,7 +69,7 @@ export const signin = async (req, res, next) => {
         const { password: pass, ...rest } = validUser._doc;
 
         //This will create a token for a valid user
-        const token = jwt.sign({ id: validUser._id, isAdmin: validUser.isAdmin}, process.env.JWT_SECRET);
+        const token = jwt.sign({ id: validUser._id, isAdmin: validUser.isAdmin }, process.env.JWT_SECRET);
         res.status(200).cookie('access_token', token, {
             httpOnly: true,
             maxAge: 60 * 60 * 1000

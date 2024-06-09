@@ -2,7 +2,8 @@ import { errorHandler } from "../utils/error.js";
 import Post from "../models/post.model.js";
 
 export const createPost = async (req, res, next) => {
-    console.log(req.body);
+    //req.body -> is the data that is sent from the client
+    //req.user -> is the user that is logged in
     if (!req.user.isAdmin) {
         return next(errorHandler(401, "Unauthorized"))
     }
@@ -16,13 +17,13 @@ export const createPost = async (req, res, next) => {
     const newPost = new Post({
         ...req.body,
         slug,
-        userId: req.user._id,
+        userId: req.user.id,
         photo: req.body.profilePicture
     })
 
     try {
         const savedPost = await newPost.save();
-        res.status(201).json(savedPost)
+        res.status(200).json(savedPost)
     } catch (e) {
         return next(errorHandler(500, e.message))
     }
@@ -30,6 +31,7 @@ export const createPost = async (req, res, next) => {
 
 //API for sending postes as requested
 export const getPosts = async (req, res, next) => {
+    // return next(errorHandler(401, "Unauthorized"))
     try {
         //from where we going to send post othws from first
         const startIndex = parseInt(req.query.startIndex) || 0;
@@ -52,7 +54,9 @@ export const getPosts = async (req, res, next) => {
         }).sort({ updatedAt: sortBy }).skip(startIndex).limit(limit)
 
         // Total Posts
-        const totalPosts = await Post.countDocuments();
+        const totalPosts = await Post.countDocuments({
+            userId: req.query.userId,
+        });
 
         //no of posts from in last month
         const now = new Date();
@@ -63,12 +67,14 @@ export const getPosts = async (req, res, next) => {
         )
         const lastMonthPosts = await Post.countDocuments({
             createdAt: { $gte: oneMonthAgo },
+            userId: req.query.userId
         })
 
         //send the response to the client
         res
             .status(200)
             .json({
+                success: true,
                 posts,
                 totalPosts,
                 lastMonthPosts

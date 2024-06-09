@@ -26,6 +26,9 @@ const postSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-}, {timestamps: true})
+    userId: {
+        type: String,
+    }
+}, { timestamps: true })
 
 export default mongoose.model("Post", postSchema);
