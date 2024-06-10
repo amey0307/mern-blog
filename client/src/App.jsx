@@ -1,5 +1,5 @@
 import React from 'react'
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import SignIn from './pages/Signin.jsx'
@@ -11,11 +11,12 @@ import PrivateRouter from './components/PrivateRouter.jsx'
 import CreatePost from './pages/CreatePost.jsx'
 import Projects from './pages/Projects.jsx'
 import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx'
+import PostUpdate from './pages/PostUpdate.jsx'
 
 function App() {
   return (
     <BrowserRouter>
-    <Header />
+      <Header />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/about' element={<About />} />
@@ -25,11 +26,12 @@ function App() {
           <Route path='/dashboard' element={<Dashboard />} />
         </Route>
         <Route element={<OnlyAdminPrivateRoute />}>
-        <Route path='/projects' element={<Projects />} />
-        <Route path='/create-post' element={<CreatePost />} />
+          <Route path='/projects' element={<Projects />} />
+          <Route path='/create-post' element={<CreatePost />} />
+          <Route path='/dashboard/editpost/:id' element={<PostUpdate />} />
         </Route>
       </Routes>
-      <FooterCom/>
+      <FooterCom />
     </BrowserRouter>
   )
 }

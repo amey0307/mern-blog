@@ -102,3 +102,33 @@ export const deletePost = async (req, res, next) => {
         return next(errorHandler(500, e.message))
     }
 }
+
+//API for updating post
+export const updatePost = async (req, res, next) => {
+    if (!req.user.isAdmin) {
+        return next(errorHandler(401, "Unauthorized"))
+    }
+
+    if (!req.body.title || !req.body.content || !req.body.category) {
+        return next(errorHandler(400, "Please fill in all fields"))
+    }
+
+    const slug = req.body.title.toLowerCase().split(' ').join('-').replace(/[^a-zA-Z0-9 -]/g, "");
+
+    try {
+        const updatedPost = await Post.findByIdAndUpdate(req.query.id, {
+            ...req.body,
+            slug,
+            userId: req.user.id,
+            photo: req.body.profilePicture
+        }, { new: true });
+
+        if (!updatedPost) {
+            return next(errorHandler(404, "Post not found"))
+        }
+
+        res.status(200).json(updatedPost)
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}

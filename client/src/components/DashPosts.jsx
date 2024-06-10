@@ -4,7 +4,7 @@ import { Alert, Button, Table, TableBody, TableCell, TableHead, TableRow } from 
 import { useDispatch } from 'react-redux';
 import { fetchingFinish, fetchingStart, setMessageTime, setUpdateMessage, setUpdateStatus } from '../redux/user/userSlice.js';
 import { HiEye, HiInformationCircle } from "react-icons/hi";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PopUp from './PopUp.jsx';
 
 function DashPosts() {
@@ -14,6 +14,7 @@ function DashPosts() {
     const [showMore, setShowMore] = useState(true);
     const [id, setId] = useState('');
     const [showPopup, setShowPopup] = useState(false);
+    const navigate = useNavigate();
 
     //fetching posts from the database at every render
     useEffect(() => {
@@ -149,7 +150,9 @@ function DashPosts() {
                                             </TableCell>
                                             {showPopup && <PopUp handleDelete={handleDelete} setShowPopup={setShowPopup} />}
                                             <TableCell>
-                                                <Link to={`/editPost/${post._id}`}><Button gradientDuoTone={'greenToBlue'} outline>Edit</Button></Link>
+                                                <Button gradientDuoTone={'greenToBlue'} outline onClick={() => {
+                                                    navigate(`/dashboard/editpost/${post._id}`)
+                                                }}>Edit</Button>
                                             </TableCell>
                                         </TableRow>
                                     </TableBody>
