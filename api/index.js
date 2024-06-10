@@ -11,12 +11,12 @@ dotenv.config();
 mongoose.connect(
     process.env.MONGO
 )
-.then(()=>{
-    console.log("Mongoose is connected");
-})
-.catch((e)=>{
-    console.log(e);
-})
+    .then(() => {
+        console.log("Mongoose is connected");
+    })
+    .catch((e) => {
+        console.log(e);
+    })
 
 const app = express();
 app.use(express.json()) //This line is to show json object in terminal during post req (console log)
@@ -33,11 +33,11 @@ app.use('/api/user', userRoutes);
 //authentication api
 app.use('/api/auth', authRoutes);
 
-//create post
+//posts
 app.use('/api/post', postRoutes)
 
 //middleware for error
-app.use((err, req, res, next)=>{
+app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error"
 

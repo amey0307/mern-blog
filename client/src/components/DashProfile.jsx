@@ -8,7 +8,7 @@ import { HiEye, HiInformationCircle } from "react-icons/hi";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useDispatch } from 'react-redux';
-import { updateFailure, updateStart, updateSuccess, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserStart, deleteUserSuccess, setMessageTime } from '../redux/user/userSlice.js';
+import { updateFailure, updateStart, updateSuccess, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserStart, deleteUserSuccess, setMessageTime, signInFailure } from '../redux/user/userSlice.js';
 import { useNavigate } from 'react-router-dom';
 import PopUp from './PopUp.jsx';
 
@@ -33,14 +33,11 @@ function DashProfile() {
     }
   }
 
-  // console.log(imageFile, imageFileUrl)
-  // console.log(currentUser.profilePicture)
-  // console.log(ImageFileUploadingProgress, imageFileUploadingError)
-
   //To remove the update message when the component is mounted
   useEffect(() => {
     dispatch(setUpdateMessage(null));
     dispatch(setUpdateStatus(null));
+    dispatch(signInFailure(null))
   }, [])
   //to replace update message if another update is made
   useEffect(() => {

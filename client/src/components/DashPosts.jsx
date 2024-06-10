@@ -2,38 +2,44 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Alert, Button, Table, TableBody, TableCell, TableHead, TableRow } from 'flowbite-react'
 import { useDispatch } from 'react-redux';
-import { setMessageTime, setUpdateMessage, setUpdateStatus } from '../redux/user/userSlice.js';
+import { fetchingFinish, fetchingStart, setMessageTime, setUpdateMessage, setUpdateStatus } from '../redux/user/userSlice.js';
 import { HiEye, HiInformationCircle } from "react-icons/hi";
 import { Link } from 'react-router-dom';
+import PopUp from './PopUp.jsx';
 
 function DashPosts() {
-    const { currentUser, updateMessage, updateStatus, messageTime } = useSelector(state => state.user);
+    const { currentUser, updateMessage, updateStatus, loading } = useSelector(state => state.user);
     const dispatch = useDispatch();
     const [userPosts, setUserPosts] = useState([])
     const [showMore, setShowMore] = useState(true);
+    const [id, setId] = useState('');
+    const [showPopup, setShowPopup] = useState(false);
 
     //fetching posts from the database at every render
     useEffect(() => {
         const fetchPosts = async () => {
+            dispatch(fetchingStart());
             try {
                 const response = await fetch(`/api/post/getPosts?userId=${currentUser._id}`)
                 const data = await response.json()
-                console.log(data.posts)
                 if (data.success === true) {
                     dispatch(setUpdateMessage('Posts fetched successfully'));
                     dispatch(setUpdateStatus('true'));
                     setUserPosts(data.posts)
                     if (data.posts.length < 9) {
                         setShowMore(false);
+                        dispatch(fetchingFinish())
                     }
                 }
                 else {
                     dispatch(setUpdateMessage('Error fetching posts'));
                     dispatch(setUpdateStatus('false'));
+                    dispatch(fetchingFinish())
                 }
             } catch (e) {
                 dispatch(setUpdateMessage('Error fetching posts'));
                 dispatch(setUpdateStatus('false'));
+                dispatch(fetchingFinish())
             }
         }
 
@@ -80,6 +86,31 @@ function DashPosts() {
         }
     }
 
+    //delete post
+    const handleDelete = async () => {
+        setShowPopup(false);
+        const fetchAdd = `/api/post/delete/?id=${id}&userId=${currentUser._id}`;
+        console.log(fetchAdd)
+        try {
+            const res = await fetch(`/api/post/delete/?id=${id}&userId=${currentUser._id}`,
+                {
+                    method: 'DELETE',
+                }
+            );
+            const data = await res.json();
+            if (!res.ok) {
+                console.log(data);
+            } else {
+                setUserPosts((prev) =>
+                    prev.filter((post) => post._id !== id)
+                );
+            }
+        } catch (error) {
+            dispatch(setUpdateMessage('Error deleting post'));
+            dispatch(setUpdateStatus('false'));
+        }
+    }
+
     return (
         <>
             {/* Refresh Button */}
@@ -102,7 +133,7 @@ function DashPosts() {
                                     <Table.HeadCell><span>Edit</span></Table.HeadCell>
                                 </TableHead>
                                 {userPosts.map((post, index) => (
-                                    <TableBody key={index}>
+                                    <TableBody key={post._id}>
                                         <TableRow>
                                             <TableCell>{new Date(post.updatedAt).toLocaleDateString()}</TableCell>
                                             <TableCell>
@@ -111,8 +142,12 @@ function DashPosts() {
                                             <TableCell className='font-bold text-balance'>{post.title}</TableCell>
                                             <TableCell>{post.category}</TableCell>
                                             <TableCell>
-                                                <Link to={`/deletePost/${post._id}`} className='text-red-500'><Button gradientDuoTone={'blueToPurple'} className='hover:scale-125 transition-all hover:underline'>Delete</Button></Link>
+                                                <Button gradientDuoTone={'blueToPurple'} className='hover:scale-125 transition-all hover:underline text-red-500' onClick={() => {
+                                                    setId(post._id)
+                                                    setShowPopup(true)
+                                                }}>Delete</Button>
                                             </TableCell>
+                                            {showPopup && <PopUp handleDelete={handleDelete} setShowPopup={setShowPopup} />}
                                             <TableCell>
                                                 <Link to={`/editPost/${post._id}`}><Button gradientDuoTone={'greenToBlue'} outline>Edit</Button></Link>
                                             </TableCell>
@@ -127,14 +162,14 @@ function DashPosts() {
                             }
                         </>
                     ) : (
-                        <h1>You have no Posts</h1>
+                        !loading && <h1 className='text-2xl text-center'>No Posts Found</h1>
                     )
                     }
                 </div>
             </div >
 
             {/* Conditional Alerts */}
-            <div>
+            <div div >
                 {
                     updateStatus === "true" ?
                         <Alert withBorderAccent
@@ -170,7 +205,7 @@ function DashPosts() {
                         :
                         null
                 }
-            </div>
+            </div >
         </>
     )
 }

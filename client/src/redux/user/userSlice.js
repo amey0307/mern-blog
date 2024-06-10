@@ -68,11 +68,17 @@ export const userSlice = createSlice({
         },
         signoutFailure: (state, action) => {
             state.error = action.payload;
+        },
+        fetchingStart: (state) => {
+            state.loading = true
+        },
+        fetchingFinish: (state) => {
+            state.loading = false;
         }
     }
 })
 
 export const { signInStart, signInSuccess, signInFailure, updateSuccess, updateFailure
-    , updateStart, updateMessage, updateStatus, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserSuccess, deleteUserStart, signoutFailure, signoutStart, signoutSuccess, setMessageTime } = userSlice.actions;
+    , updateStart, updateMessage, updateStatus, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserSuccess, deleteUserStart, signoutFailure, signoutStart, signoutSuccess, setMessageTime, fetchingStart, fetchingFinish } = userSlice.actions;
 
 export default userSlice.reducer;

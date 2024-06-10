@@ -1,6 +1,7 @@
 import { errorHandler } from "../utils/error.js";
 import Post from "../models/post.model.js";
 
+//API for creating post
 export const createPost = async (req, res, next) => {
     //req.body -> is the data that is sent from the client
     //req.user -> is the user that is logged in
@@ -81,5 +82,23 @@ export const getPosts = async (req, res, next) => {
             })
     } catch (e) {
         next(errorHandler(401, `Error Fetching Posts: ${e}`));
+    }
+}
+
+//Api for deleting post
+export const deletePost = async (req, res, next) => {
+    console.log(req.query)
+    if (!req.user.isAdmin) {
+        return next(errorHandler(401, "Unauthorized"))
+    }
+
+    try {
+        const deletedPost = await Post.findByIdAndDelete(req.query.id);
+        if (!deletedPost) {
+            return next(errorHandler(404, "Post not found"))
+        }
+        res.status(200).json({ success: true, deletedPost })
+    } catch (e) {
+        return next(errorHandler(500, e.message))
     }
 }

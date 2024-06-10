@@ -8,13 +8,8 @@ import { HiEye, HiInformationCircle } from "react-icons/hi";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
-
-  // const [loading, setLoading] = useState(false);
-  // const [errorMessage, setErrorMessage] = useState(null);
-
   const { loading, error: errorMessage, updateMessage, updateStatus } = useSelector(state => state.user);
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,6 +20,7 @@ function SignIn() {
   useEffect(() => {
     dispatch(setUpdateMessage(null));
     dispatch(setUpdateStatus(null));
+    dispatch(signInFailure(null))
   }, [])
 
   //to replace update message if another update is made
@@ -37,7 +33,7 @@ function SignIn() {
       return () => clearTimeout(timer);
     }
   }, [updateMessage])
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -133,7 +129,7 @@ function SignIn() {
               </Button>
 
               <OAuth />
-                
+
             </div>
           </form>
 
@@ -143,40 +139,40 @@ function SignIn() {
           </div>
 
           {
-        updateStatus === "true" ?
-          <Alert withBorderAccent
-            icon={HiEye}
-            color='green'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
-          </Alert>
-          :
-          null
-      }
+            updateStatus === "true" ?
+              <Alert withBorderAccent
+                icon={HiEye}
+                color='green'
+                className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+                {updateMessage}
+              </Alert>
+              :
+              null
+          }
 
-      {
-        updateStatus === "false" ?
-          <Alert withBorderAccent
-            icon={HiInformationCircle}
-            color='red'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
-          </Alert>
-          :
-          null
-      }
+          {
+            updateStatus === "false" ?
+              <Alert withBorderAccent
+                icon={HiInformationCircle}
+                color='red'
+                className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+                {updateMessage}
+              </Alert>
+              :
+              null
+          }
 
-      {
-        updateStatus === "noChange" ?
-          <Alert withBorderAccent
-            icon={HiInformationCircle}
-            color='yellow'
-            className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
-            {updateMessage}
-          </Alert>
-          :
-          null
-      }
+          {
+            updateStatus === "noChange" ?
+              <Alert withBorderAccent
+                icon={HiInformationCircle}
+                color='yellow'
+                className='mt-4 right-4 top-20 absolute animate-SlideIn text-md'>
+                {updateMessage}
+              </Alert>
+              :
+              null
+          }
 
         </div>
       </div>
