@@ -85,41 +85,6 @@ function CreatePost(props) {
         }
     }
 
-    //function to handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            dispatch(setUpdateMessage("Creating Post..."));
-            dispatch(setUpdateStatus("noChange"));
-            const res = await fetch('/api/post/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-            const data = await res.json();
-            if (res.ok) {
-                dispatch(setUpdateMessage("Post Created Successfully"));
-                dispatch(setUpdateStatus("true"));
-                navigate(`/post/${data.slug}`)
-            }
-            else {
-                if (firstWord(data.message) === "E11000") {
-                    dispatch(setUpdateMessage("Title Already Exists"));
-                    dispatch(setUpdateStatus("false"));
-                }
-                else {
-                    dispatch(setUpdateMessage(data.message));
-                    dispatch(setUpdateStatus("false"));
-                }
-            }
-        } catch (e) {
-            dispatch(setUpdateMessage("Post Creation Failed"));
-            dispatch(setUpdateStatus("false"));
-        }
-    }
-
     //function to handle image upload
     const handleUpload = async (e) => {
         if (!imageFile) {
@@ -163,6 +128,32 @@ function CreatePost(props) {
         )
 
     }
+
+    //function to handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            //call API here
+            const res = await fetch(`/api/post/update?id=${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            const data = await res.json();
+            if (res.ok) {
+                dispatch(setUpdateMessage("Post updated Suceessfully"));
+                dispatch(setUpdateStatus("true"));
+                navigate('/dashboard?tab=posts')
+            }
+        } catch (e) {
+            dispatch(setUpdateMessage("Post Creation Failed"));
+            dispatch(setUpdateStatus("false"));
+        }
+    }
+
+
 
     return (
         <div className='flex'>
@@ -236,7 +227,7 @@ function CreatePost(props) {
                     </Button>
                 </form>
 
-                {/* //Alerts */}
+                {/* Conditional Alerts */}
                 <div>
                     {
                         updateStatus === "true" ?
