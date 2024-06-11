@@ -53,7 +53,7 @@ function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
 
       if (data.success === false) {
         // return setErrorMessage(data.message)
@@ -67,7 +67,7 @@ function SignIn() {
         dispatch(signInSuccess(data))
         dispatch(setUpdateMessage("User Signed In Successfully"));
         dispatch(setUpdateStatus("true"));
-        navigate("/dashboard?tab=profile");
+        navigate("/");
       }
 
     } catch (err) {
