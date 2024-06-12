@@ -55,6 +55,10 @@ function DashSidebar() {
     }
   }
 
+  const handleUsers = () => {
+    navigate('/manage-users')
+  }
+
   return (
     <>
       <Sidebar className='w-full md:w-56'>
@@ -64,6 +68,13 @@ function DashSidebar() {
               Profile
             </Sidebar.Item>
             {
+              currentUser.isAdmin &&
+              <Sidebar.Item active={tab === 'users'} icon={HiUser} label={currentUser.isAdmin ? "Admin" : 'User'} labelColor='dark' className='cursor-pointer hover:opacity-75' onClick={handleUsers}>
+                Users
+              </Sidebar.Item>
+            }
+
+            {
               currentUser.isAdmin && (
                 <Link to='/dashboard?tab=posts'>
                   <Sidebar.Item active={tab === 'users'} icon={HiUser} className='cursor-pointer hover:opacity-75'>
@@ -72,6 +83,7 @@ function DashSidebar() {
                 </Link>
               )
             }
+
             <Sidebar.Item active={tab === 'sign-out'} icon={HiArrowSmRight} className='cursor-pointer hover:opacity-75' onClick={handleSignOut}>
               Sign Out
             </Sidebar.Item>

@@ -8,6 +8,7 @@ const initialState = {
     updateMessage: null,
     updateStatus: null,
     messageTime: Number(5),
+    // likedPostId: null,
 }
 
 export const userSlice = createSlice({
@@ -74,7 +75,10 @@ export const userSlice = createSlice({
         },
         fetchingFinish: (state) => {
             state.loading = false;
-        }
+        },
+        // setLikedPostId: (state, action) => {
+        //     state.likedPostId = action.payload;
+        // },
     }
 })
 

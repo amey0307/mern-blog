@@ -24,7 +24,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-}, {timestamps: true});
+    LikedPostId: {
+        type: [String],
+        default: []
+    }
+}, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
 export default User;

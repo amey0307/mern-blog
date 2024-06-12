@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import { errorHandler } from '../utils/error.js';
 import bcryptjs from 'bcryptjs'
+import Post from "../models/post.model.js";
 
 export const test = (req, res) => {
     res.json({ name: "Api is working" });
@@ -47,7 +48,7 @@ export const updateUser = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
 
-    if (req.user.id !== req.params.userId) {
+    if (req.user.id !== req.params.userId && !req.user.isAdmin) {
         return next(errorHandler(401, "Unauthorized"))
     }
     try {
@@ -63,4 +64,43 @@ export const signout = (req, res) => {
     res
         .clearCookie('access_token')
         .json("Signout success");
+}
+
+export const likedPost = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const post = await Post.findById(req.query.postId);
+        if (user.LikedPostId.includes(req.query.postId)) {
+            user.LikedPostId.pull(post._id);
+            post.likedByUsers.pull(user._id)
+            post.likes -= 1;
+        }
+        else {
+            user.LikedPostId.push(post._id);
+            post.likedByUsers.push(user._id)
+            post.likes += 1;
+        }
+
+        await user.save();
+        await post.save();
+
+        res.status(200).json({ message: 'Success', likedPosts: user.LikedPostId });
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const getLikePost = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        res.status(200).json(user.LikedPostId);
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const getUsers = async (req, res, next) => {
+    const users = await User.find({ isAdmin: false })
+    res.status(200).json(users)
+
 }

@@ -12,6 +12,7 @@ import CreatePost from './pages/CreatePost.jsx'
 import Projects from './pages/Projects.jsx'
 import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx'
 import PostUpdate from './pages/PostUpdate.jsx'
+import ManageUsers from './components/ManageUsers.jsx'
 
 function App() {
   return (
@@ -25,10 +26,11 @@ function App() {
         <Route element={<PrivateRouter />}>
           <Route path='/dashboard' element={<Dashboard />} />
         </Route>
+        <Route path='/projects' element={<Projects />} />
         <Route element={<OnlyAdminPrivateRoute />}>
-          <Route path='/projects' element={<Projects />} />
           <Route path='/create-post' element={<CreatePost />} />
           <Route path='/dashboard/editpost/:id' element={<PostUpdate />} />
+          <Route path='/manage-users' element={<ManageUsers />} />
         </Route>
       </Routes>
       <FooterCom />
