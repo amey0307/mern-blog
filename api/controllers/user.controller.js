@@ -66,34 +66,34 @@ export const signout = (req, res) => {
         .json("Signout success");
 }
 
-export const likedPost = async (req, res, next) => {
-    try {
-        const user = await User.findById(req.user.id);
-        const post = await Post.findById(req.query.postId);
-        if (user.LikedPostId.includes(req.query.postId)) {
-            user.LikedPostId.pull(post._id);
-            post.likedByUsers.pull(user._id)
-            post.likes -= 1;
-        }
-        else {
-            user.LikedPostId.push(post._id);
-            post.likedByUsers.push(user._id)
-            post.likes += 1;
-        }
+// export const likedPost = async (req, res, next) => {
+//     try {
+//         const user = await User.findById(req.user.id);
+//         const post = await Post.findById(req.query.postId);
+//         if (user.LikedPostId.includes(req.query.postId)) {
+//             user.LikedPostId.pull(post._id);
+//             post.likedByUsers.pull(user._id)
+//             post.likes -= 1;
+//         }
+//         else {
+//             user.LikedPostId.push(post._id);
+//             post.likedByUsers.push(user._id)
+//             post.likes += 1;
+//         }
 
-        await user.save();
-        await post.save();
+//         await user.save();
+//         await post.save();
 
-        res.status(200).json({ message: 'Success', likedPosts: user.LikedPostId });
-    } catch (e) {
-        return next(errorHandler(500, e.message))
-    }
-}
+//         res.status(200).json({ message: 'Success', likedPosts: user.LikedPostId });
+//     } catch (e) {
+//         return next(errorHandler(500, e.message))
+//     }
+// }
 
 export const getLikePost = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id);
-        res.status(200).json(user.LikedPostId);
+        res.status(200).json({ success: true, posts: user.LikedPostId });
     } catch (e) {
         return next(errorHandler(500, e.message))
     }

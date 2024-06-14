@@ -8,7 +8,7 @@ const initialState = {
     updateMessage: null,
     updateStatus: null,
     messageTime: Number(5),
-    // likedPostId: null,
+    likedPostId: null,
 }
 
 export const userSlice = createSlice({
@@ -76,13 +76,13 @@ export const userSlice = createSlice({
         fetchingFinish: (state) => {
             state.loading = false;
         },
-        // setLikedPostId: (state, action) => {
-        //     state.likedPostId = action.payload;
-        // },
+        setLikedPostId: (state, action) => {
+            state.likedPostId = action.payload;
+        },
     }
 })
 
 export const { signInStart, signInSuccess, signInFailure, updateSuccess, updateFailure
-    , updateStart, updateMessage, updateStatus, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserSuccess, deleteUserStart, signoutFailure, signoutStart, signoutSuccess, setMessageTime, fetchingStart, fetchingFinish } = userSlice.actions;
+    , updateStart, updateMessage, updateStatus, setUpdateMessage, setUpdateStatus, deleteUserFailure, deleteUserSuccess, deleteUserStart, signoutFailure, signoutStart, signoutSuccess, setMessageTime, fetchingStart, fetchingFinish, setLikedPostId } = userSlice.actions;
 
 export default userSlice.reducer;

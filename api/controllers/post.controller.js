@@ -1,5 +1,6 @@
 import { errorHandler } from "../utils/error.js";
 import Post from "../models/post.model.js";
+import User from "../models/user.model.js";
 
 //API for creating post
 export const createPost = async (req, res, next) => {
@@ -132,3 +133,55 @@ export const updatePost = async (req, res, next) => {
         return next(errorHandler(500, e.message))
     }
 }
+
+export const likePost = async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.query.postId);
+
+        if (post.likedByUsers.includes(req.user.id)) {
+            post.likedByUsers.pull(req.user.id);
+            post.likes -= 1;
+            post.isLikedByUser = false;
+        }
+        post.likedByUsers.push(req.user.id);
+        post.likes += 1;
+        post.isLikedByUser = true;
+
+
+        await post.save();
+        res.status(200).json(post.likedByUsers)
+
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const unlikePost = async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.query.postId);
+
+        if (post.likedByUsers.includes(req.user.id)) {
+            post.likedByUsers.pull(req.user.id);
+            post.likes -= 1;
+            post.isLikedByUser = false;
+        }
+
+
+        await post.save();
+        res.status(200).json(post.likedByUsers)
+    }
+    catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const getLikedPosts = async (req, res, next) => {
+    try {
+        const posts = await Post.find({ likedByUsers: req.user.id });
+        res.status(200).json(posts)
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+

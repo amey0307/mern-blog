@@ -9,7 +9,7 @@ import Header from './components/Header.jsx'
 import FooterCom from './components/FooterCom.jsx'
 import PrivateRouter from './components/PrivateRouter.jsx'
 import CreatePost from './pages/CreatePost.jsx'
-import Projects from './pages/Projects.jsx'
+import Favorite from './pages/Favorite.jsx'
 import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx'
 import PostUpdate from './pages/PostUpdate.jsx'
 import ManageUsers from './components/ManageUsers.jsx'
@@ -26,7 +26,7 @@ function App() {
         <Route element={<PrivateRouter />}>
           <Route path='/dashboard' element={<Dashboard />} />
         </Route>
-        <Route path='/projects' element={<Projects />} />
+        <Route path='/favorites' element={<Favorite />} />
         <Route element={<OnlyAdminPrivateRoute />}>
           <Route path='/create-post' element={<CreatePost />} />
           <Route path='/dashboard/editpost/:id' element={<PostUpdate />} />
