@@ -13,6 +13,7 @@ import Favorite from './pages/Favorite.jsx'
 import OnlyAdminPrivateRoute from './components/OnlyAdminPrivateRoute.jsx'
 import PostUpdate from './pages/PostUpdate.jsx'
 import ManageUsers from './components/ManageUsers.jsx'
+import ReadPost from './components/ReadPost.jsx'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path='/dashboard' element={<Dashboard />} />
         </Route>
         <Route path='/favorites' element={<Favorite />} />
+        <Route path='/read/:postId' element={<ReadPost />} />
         <Route element={<OnlyAdminPrivateRoute />}>
           <Route path='/create-post' element={<CreatePost />} />
           <Route path='/dashboard/editpost/:id' element={<PostUpdate />} />

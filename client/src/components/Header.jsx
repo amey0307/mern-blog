@@ -14,6 +14,8 @@ function Header() {
     const { currentUser } = useSelector(state => state.user);
     const { theme } = useSelector(state => state.theme);
     const navigate = useNavigate();
+    const [search, setSearch] = useState('');
+    const [showSearch, setShowSearch] = useState([]);
 
     // console.log(currentUser)
 
@@ -44,6 +46,26 @@ function Header() {
         }
     }
 
+    const handleChange = (e) => {
+        setSearch(e.target.value);
+    }
+
+    useEffect(() => {
+        try {
+            const fetchPost = async () => {
+                const res = await fetch(`/api/post/search?search=${search}`)
+                if (res.ok) {
+                    const data = await res.json()
+                    console.log(data)
+                    setShowSearch(data)
+                }
+            }
+            fetchPost();
+        } catch (e) {
+            console.log(e)
+        }
+    }, [search])
+
     return (
         <Navbar className='border-b-2'>
             <Link to='/' className='self-center whitespace-nowrap text-sm sm:text-xl font-semibold dark:text-white'>
@@ -57,7 +79,27 @@ function Header() {
                     placeholder='Search'
                     rightIcon={AiOutlineSearch}
                     className='hidden lg:inline'
+                    onChange={handleChange}
                 />
+                {
+                    search.length > 0 &&
+                    <div className='absolute top-14 left-[30%] z-10 bg-white w-fit border border-gray-200 rounded-lg shadow-lg'>
+                        <ul>
+                            {showSearch.map((post, index) => (
+                                <li key={index} className='p-2 hover:bg-gray-100 w-[20vw] cursor-pointer dark:bg-slate-800'>
+                                    <div onClick={() => {
+                                        navigate(`/read/${post._id}`)
+                                        setSearch('')
+                                        { window.location.reload() }
+                                    }}>
+                                        {window.innerWidth > 768 ? post.title : post.title.slice(0, 20) + '...'}
+                                    </div>
+                                </li>
+                            ))
+                            }
+                        </ul>
+                    </div>
+                }
             </form>
 
             <Button className='w-12 h-10 lg:hidden' color='gray'>

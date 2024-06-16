@@ -9,7 +9,6 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import { useNavigate } from 'react-router-dom';
-import DashSidebar from '../components/DashSidebar.jsx';
 
 function CreatePost() {
     const [formData, setFormData] = useState({})
@@ -80,7 +79,7 @@ function CreatePost() {
             if (res.ok) {
                 dispatch(setUpdateMessage("Post Created Successfully"));
                 dispatch(setUpdateStatus("true"));
-                navigate(`/post/${data.slug}`)
+                navigate(`/read/${data._id}`)
             }
             else {
                 if (firstWord(data.message) === "E11000") {

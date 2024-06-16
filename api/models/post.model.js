@@ -40,6 +40,30 @@ const postSchema = new mongoose.Schema({
     isLikedByUser: {
         type: Boolean,
         default: false
+    },
+    comment: {
+        type: Array,
+        default: [
+            {
+                commentId: String,
+                userId: String,
+                userName: String,
+                comment: String,
+            }
+        ]
+    },
+    reply: {
+        type: Array,
+        default: [
+            {
+                commentId: String,
+                replyId: String,
+                userId: String,
+                userName: String,
+                reply: String
+            }
+        ]
+
     }
 }, { timestamps: true })
 

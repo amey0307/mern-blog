@@ -184,4 +184,74 @@ export const getLikedPosts = async (req, res, next) => {
     }
 }
 
+export const commentOnPost = async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.body.postId);
+        post.comment.push({
+            userId: req.user.id,
+            comment: req.body.comment,
+            commentId: req.body.commentId,
+            userName: req.body.userName,
+        })
+        await post.save();
+        res.status(200).json(post.comment)
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const replyOnPost = async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.body.postId);
+        const reply = {
+            $push: {
+                reply: {
+                    userId: req.body.userId,
+                    reply: req.body.reply,
+                    replyId: req.body.replyId,
+                    userName: req.body.userName,
+                    commentId: req.body.commentId
+                }
+            }
+        }
+        await post.updateOne(reply);
+        res.status(200).json(post.reply)
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const getComments = async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.query.postId);
+        res.status(200).json(post.comment)
+    }
+    catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const getReplies = async (req, res, next) => {
+    try {
+        const post = await Post.findById(req.query.postId);
+        res.status(200).json(post.reply)
+    }
+    catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
+
+export const searchPosts = async (req, res, next) => {
+    try {
+        const posts = await Post.find({
+            $or: [
+                { title: { $regex: req.query.search, $options: 'i' } },
+                { content: { $regex: req.query.search, $options: 'i' } }
+            ]
+        })
+        res.status(200).json(posts)
+    } catch (e) {
+        return next(errorHandler(500, e.message))
+    }
+}
 
