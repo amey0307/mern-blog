@@ -16,7 +16,7 @@ function About() {
               :
               <img src={badgeBlack} alt='badge' className='md:w-20 md:h-20 sm:w-12 sm:h-12 relative bottom-5' />
           }
-          <h1 className='md:text-[56px] sm:text-xl '>Hello <span className='dark:text-yellow-300 text-yellow-500 bg-[#fffc9f] dark:bg-[#c9f8a829] rounded-xl px-2'>{currentUser.username}</span></h1>
+          <h1 className='md:text-[56px] sm:text-xl '>Hello <span className='dark:text-yellow-300 text-yellow-500 bg-[#fffc9f] dark:bg-[#c9f8a829] rounded-xl px-2' hidden={!currentUser?.username}>{currentUser?.username}</span></h1>
         </div>
         <div className='p-4'>
           <p className='text-xl'>

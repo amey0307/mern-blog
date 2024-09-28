@@ -30,7 +30,7 @@ function Favorite() {
         setLoading(true)
         fetchPosts();
         setLoading(false)
-    }, [currentUser.id])
+    }, [currentUser?.id])
 
     const have = (arr) => {
         for (let i = 0; i < arr.length; i++) {
@@ -102,7 +102,7 @@ function Favorite() {
                             :
                             <img src={badgeBlack} alt='badge' className='md:w-16 md:h-16 sm:w-12 sm:h-12 relative bottom-4' />
                     }
-                    <h1 className='md:text-[56px] sm:text-xl'>Hello <span className='dark:green-yellow-300 text-green-500 bg-[#c8ff91] rounded-2xl px-2 dark:bg-[rgba(34,76,4,0.52)]'>{currentUser.username}</span></h1>
+                    <h1 className='md:text-[56px] sm:text-xl'>Hello <span className='dark:green-yellow-300 text-green-500 bg-[#c8ff91] rounded-2xl px-2 dark:bg-[rgba(34,76,4,0.52)]' hidden={!currentUser?.username}>{currentUser?.username}</span></h1>
                 </div>
                 <h1 className='text-3xl relative left-[76px] bottom-4'>Here are your favorite posts</h1>
             </div>
@@ -123,7 +123,7 @@ function Favorite() {
 
                                             <div className='text-sm absolute right-4 bottom-7 hover:scale-110 transition-all' key={post._id} onClick={() => {
                                                 console.log(post._id)
-                                            }}>
+                                            }} >
                                                 {
                                                     have(post?.likedByUsers) ?
                                                         < img src={liked} alt='like' className='w-8 h-8 hover:scale-110 transition-all' key={index} onClick={() => {

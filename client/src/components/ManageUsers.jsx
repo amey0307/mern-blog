@@ -43,7 +43,7 @@ function ManageUsers() {
             );
 
         } catch (e) {
-            console.log(object)
+            console.log(e)
         }
 
     }

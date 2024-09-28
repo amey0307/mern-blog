@@ -9,12 +9,13 @@ import postRoutes from './routes/post.route.js'
 dotenv.config();
 
 mongoose.connect(
-    process.env.MONGO
+    "mongodb+srv://ameytr07:ameytr07@mern-blog.1z6qnxd.mongodb.net/mern-blog?retryWrites=true&w=majority&appName=Mern-blog"
 )
     .then(() => {
         console.log("Mongoose is connected");
     })
     .catch((e) => {
+        console.log("Lund ni connect hua bc mongoose se");
         console.log(e);
     })
 

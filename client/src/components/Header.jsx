@@ -17,8 +17,6 @@ function Header() {
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState([]);
 
-    // console.log(currentUser)
-
     const handleSignOut = async () => {
         try {
             dispatch(signoutStart());
@@ -39,6 +37,7 @@ function Header() {
                 dispatch(setUpdateStatus("false"));
                 dispatch(signoutFailure(data.message));
             }
+            window.location.reload();
         } catch (error) {
             dispatch(setUpdateMessage(`Error : ${error.message}`));
             dispatch(setUpdateStatus("false"));
@@ -56,7 +55,6 @@ function Header() {
                 const res = await fetch(`/api/post/search?search=${search}`)
                 if (res.ok) {
                     const data = await res.json()
-                    console.log(data)
                     setShowSearch(data)
                 }
             }
